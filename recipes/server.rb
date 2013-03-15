@@ -136,6 +136,19 @@ unless platform_family?(%w{mac_os_x})
                    end
 end
 
+# Init script file existence check is more reliable than version check
+# for packages from different vendors ( e.g. MySQL.com, RedHat, Percona )
+case node["platform_family"]
+  when "rhel", "fedora", "suse"
+    if File.exist?("/etc/init.d/mysql")
+      node.set['mysql']['service_name']            = "mysql"
+      node.set['mysql']['pid_file']                = "/var/run/mysql/mysql.pid"
+    elsif File.exist?("/etc/init.d/mysqld")
+      node.set['mysql']['service_name']            = "mysqld"
+      node.set['mysql']['pid_file']                = "/var/run/mysqld/mysqld.pid"
+  end
+end
+
 # Homebrew has its own way to do databases
 if platform_family?(%w{mac_os_x})
   execute "mysql-install-db" do
