@@ -146,6 +146,8 @@ case node["platform_family"]
     elsif File.exist?("/etc/init.d/mysqld")
       node.set['mysql']['service_name']            = "mysqld"
       node.set['mysql']['pid_file']                = "/var/run/mysqld/mysqld.pid"
+    else
+      Chef::Application.fatal!("Unknown MySQL service name, check installed packages")
   end
 end
 
