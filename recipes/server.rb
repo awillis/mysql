@@ -98,15 +98,6 @@ end
 
 unless platform_family?(%w{mac_os_x})
 
-  skip_federated = case node['platform']
-                   when 'fedora', 'ubuntu', 'amazon'
-                     true
-                   when 'centos', 'redhat', 'scientific'
-                     node['platform_version'].to_f < 6.0
-                   else
-                     false
-                   end
-
   template "#{node['mysql']['conf_dir']}/my.cnf" do
     source "my.cnf.erb"
     owner "root" unless platform? 'windows'
@@ -120,7 +111,14 @@ unless platform_family?(%w{mac_os_x})
     else
       Chef::Log.info "my.cnf updated but mysql.reload_action is #{node['mysql']['reload_action']}. No action taken."
     end
-    variables :skip_federated => skip_federated
+    variables :skip_federated => case node['platform']
+                                 when 'fedora', 'ubuntu', 'amazon'
+                                   true
+                                 when 'centos', 'redhat', 'scientific'
+                                   node['platform_version'].to_f < 6.0
+                                 else
+                                   false
+                                 end
   end
 
   [File.dirname(node['mysql']['pid_file']),
