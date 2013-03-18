@@ -147,7 +147,7 @@ case node["platform_family"]
       node.set['mysql']['service_name']            = "mysqld"
       node.set['mysql']['pid_file']                = "/var/run/mysqld/mysqld.pid"
     else
-      Chef::Application.fatal!("Unknown MySQL service name, check installed packages")
+      Chef::Application.fatal!("MySQL service name is not 'mysql' or 'mysqld', check installed packages")
   end
 end
 
