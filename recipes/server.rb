@@ -98,14 +98,14 @@ end
 
 unless platform_family?(%w{mac_os_x})
 
-  skip_federated = case node['platform']
-                   when 'fedora', 'ubuntu', 'amazon'
-                     true
-                   when 'centos', 'redhat', 'scientific'
-                     node['platform_version'].to_f < 6.0
-                   else
-                     false
-                   end
+#  skip_federated = case node['platform']
+#                   when 'fedora', 'ubuntu', 'amazon'
+#                     true
+#                   when 'centos', 'redhat', 'scientific'
+#                     node['platform_version'].to_f < 6.0
+#                   else
+#                     false
+#                   end
 
   template "#{node['mysql']['conf_dir']}/my.cnf" do
     source "my.cnf.erb"
@@ -120,7 +120,14 @@ unless platform_family?(%w{mac_os_x})
     else
       Chef::Log.info "my.cnf updated but mysql.reload_action is #{node['mysql']['reload_action']}. No action taken."
     end
-    variables :skip_federated => skip_federated
+    variables :skip_federated => case node['platform']
+                                 when 'fedora', 'ubuntu', 'amazon'
+                                   true
+                                 when 'centos', 'redhat', 'scientific'
+                                   node['platform_version'].to_f < 6.0
+                                 else
+                                   false
+                                 end
   end
 
   [File.dirname(node['mysql']['pid_file']),
@@ -162,7 +169,7 @@ case node["platform_family"]
       node.set['mysql']['service_name']            = "mysqld"
       node.set['mysql']['pid_file']                = "/var/run/mysqld/mysqld.pid"
     else
-      Chef::Application.fatal!("Unknown MySQL service name, check installed packages")
+      Chef::Application.fatal!("MySQL service name is not 'mysql' or 'mysqld', check installed packages")
   end
 end
 
