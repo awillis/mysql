@@ -92,8 +92,8 @@ end
 
 node['mysql']['server']['packages'].each do |package_name|
   package package_name do
-    action :install
-  end
+    action :nothing
+  end.run_action(:install)
 end
 
 unless platform_family?(%w{mac_os_x})
