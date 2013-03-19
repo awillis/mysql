@@ -44,8 +44,8 @@ end
 
 node['mysql']['client']['packages'].each do |mysql_pack|
   package mysql_pack do
-    action :install
-  end
+    action :nothing
+  end.run_action(:install)
 end
 
 if platform? 'windows'

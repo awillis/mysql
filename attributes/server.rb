@@ -122,6 +122,7 @@ if attribute?('ec2')
 end
 
 default['mysql']['reload_action'] = "restart" # or "reload" or "none"
+default['mysql']['default_action'] = "start" # A valid service resource action
 
 default['mysql']['use_upstart'] = node['platform'] == "ubuntu" && node['platform_version'].to_f >= 10.04
 

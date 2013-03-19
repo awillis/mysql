@@ -204,21 +204,28 @@ unless platform_family?(%w{mac_os_x})
     end
   end
 
-  if platform_family? 'windows'
-    windows_batch "mysql-install-privileges" do
-      command "\"#{node['mysql']['mysql_bin']}\" -u root #{node['mysql']['server_root_password'].empty? ? '' : '-p' }\"#{node['mysql']['server_root_password']}\" < \"#{grants_path}\""
-      action :nothing
-      subscribes :run, resources("template[#{grants_path}]"), :immediately
+  service "mysql" do
+    service_name node['mysql']['service_name']
+    if node['mysql']['use_upstart']
+      provider Chef::Provider::Service::Upstart
     end
-  else
-    execute "mysql-install-privileges" do
-      command %Q["#{node['mysql']['mysql_bin']}" -u root #{node['mysql']['server_root_password'].empty? ? '' : '-p' }"#{node['mysql']['server_root_password']}" < "#{grants_path}"]
-      action :nothing
-      subscribes :run, resources("template[#{grants_path}]"), :immediately
-    end
+    supports :status => true, :restart => true, :reload => true
+    action node['mysql']['default_action']
   end
 
-  service "mysql" do
-    action :start
+  if node['mysql']['default_action'] == "start"
+    if platform_family? 'windows'
+      windows_batch "mysql-install-privileges" do
+        command "\"#{node['mysql']['mysql_bin']}\" -u root #{node['mysql']['server_root_password'].empty? ? '' : '-p' }\"#{node['mysql']['server_root_password']}\" < \"#{grants_path}\""
+        action :nothing
+        subscribes :run, resources("template[#{grants_path}]"), :immediately
+      end
+    else
+      execute "mysql-install-privileges" do
+        command %Q["#{node['mysql']['mysql_bin']}" -u root #{node['mysql']['server_root_password'].empty? ? '' : '-p' }"#{node['mysql']['server_root_password']}" < "#{grants_path}"]
+        action :nothing
+        subscribes :run, resources("template[#{grants_path}]"), :immediately
+      end
+    end
   end
 end
