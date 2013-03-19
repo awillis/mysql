@@ -204,22 +204,6 @@ unless platform_family?(%w{mac_os_x})
     supports :status => true, :restart => true, :reload => true
     action node['mysql']['default_action']
   end
-
-  if node['mysql']['default_action'] == "start"
-    if platform_family? 'windows'
-      windows_batch "mysql-install-privileges" do
-        command "\"#{node['mysql']['mysql_bin']}\" -u root #{node['mysql']['server_root_password'].empty? ? '' : '-p' }\"#{node['mysql']['server_root_password']}\" < \"#{grants_path}\""
-        action :nothing
-        subscribes :run, resources("template[#{grants_path}]"), :immediately
-      end
-    else
-      execute "mysql-install-privileges" do
-        command %Q["#{node['mysql']['mysql_bin']}" -u root #{node['mysql']['server_root_password'].empty? ? '' : '-p' }"#{node['mysql']['server_root_password']}" < "#{grants_path}"]
-        action :nothing
-        subscribes :run, resources("template[#{grants_path}]"), :immediately
-      end
-    end
-  end
 end
 
 # set the root password for situations that don't support pre-seeding.
@@ -229,3 +213,20 @@ execute "assign-root-password" do
   action :run
   only_if "\"#{node['mysql']['mysql_bin']}\" -u root -e 'show databases;'"
 end
+
+if node['mysql']['default_action'] == "start"
+  if platform_family? 'windows'
+    windows_batch "mysql-install-privileges" do
+      command "\"#{node['mysql']['mysql_bin']}\" -u root #{node['mysql']['server_root_password'].empty? ? '' : '-p' }\"#{node['mysql']['server_root_password']}\" < \"#{grants_path}\""
+      action :nothing
+      subscribes :run, resources("template[#{grants_path}]"), :immediately
+    end
+  else
+    execute "mysql-install-privileges" do
+      command %Q["#{node['mysql']['mysql_bin']}" -u root #{node['mysql']['server_root_password'].empty? ? '' : '-p' }"#{node['mysql']['server_root_password']}" < "#{grants_path}"]
+      action :nothing
+      subscribes :run, resources("template[#{grants_path}]"), :immediately
+    end
+  end
+end
+
