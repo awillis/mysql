@@ -1,8 +1,8 @@
-name		  "mysql_pending"
-maintainer        "Alan Willis"
-maintainer_email  "alwillis@riotgames.com"
+name		  "mysql"
+maintainer        "Opscode, Inc."
+maintainer_email  "cookbooks@opscode.com"
 license           "Apache 2.0"
-description       "Temporary fork of community mysql cookbook"
+description       "Installs and configures mysql for client or server"
 long_description  IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 version           "2.1.2"
 recipe            "mysql", "Includes the client recipe to configure a client"

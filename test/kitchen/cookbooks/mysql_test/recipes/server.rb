@@ -21,7 +21,7 @@ node.set['mysql']['server_debian_password'] = "ilikerandompasswords"
 node.set['mysql']['server_root_password']   = "ilikerandompasswords"
 node.set['mysql']['server_repl_password']   = "ilikerandompasswords"
 
-include_recipe "mysql_pending::ruby"
+include_recipe "mysql::ruby"
 include_recipe "yum::epel" if platform_family?('rhel')
 
 file "/etc/sysconfig/network" do
@@ -30,7 +30,7 @@ file "/etc/sysconfig/network" do
   only_if { platform_family?('rhel', 'fedora') }
 end
 
-include_recipe 'mysql_pending::server'
+include_recipe 'mysql::server'
 
 mysql_connection = {:host => "localhost", :username => 'root',
                     :password => node['mysql']['server_root_password']}

@@ -17,4 +17,4 @@
 # limitations under the License.
 #
 
-include_recipe "mysql_pending::client"
+include_recipe "mysql::client"
